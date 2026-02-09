@@ -2,7 +2,7 @@ import ImageKit from "imagekit"
 
 const imagekit = new ImageKit({
   publicKey: process.env.NEXT_PUBLIC_IMAGEKIT_PUBLIC_KEY || "public_BNYwK4yQqPrxchxhTXhDI1OKMGQ=",
-  privateKey: process.env.IMAGEKIT_PRIVATE_KEY || "",
+  privateKey: process.env.IMAGEKIT_PRIVATE_KEY || "private_Ap0W4UYDTof+3K76NzuN8grLF10=",
   urlEndpoint: process.env.NEXT_PUBLIC_IMAGEKIT_URL_ENDPOINT || "https://ik.imagekit.io/countryroofdata",
 })
 
