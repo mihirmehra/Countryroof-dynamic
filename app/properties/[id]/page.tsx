@@ -13,10 +13,10 @@ import {
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { generatePropertySchema } from "@/lib/schema-markup-generator"
-import Header from "@/components/layout/header"
-import Footer from "@/components/layout/footer"
+
 import Link from "next/link"
 import { cn, formatPriceToIndian } from "@/lib/utils"
+import { useRecentlyViewed } from "@/hooks/use-recently-viewed"
 
 // Amenity icon mapping
 const AMENITY_ICONS: Record<string, any> = {
@@ -41,6 +41,7 @@ export default function PropertyDetailPage({ params }: { params: Promise<{ id: s
   const [activeImage, setActiveImage] = useState(0)
   const [showFullscreen, setShowFullscreen] = useState(false)
   const [isLiked, setIsLiked] = useState(false)
+  const { addProperty: addToRecentlyViewed } = useRecentlyViewed()
 
   useEffect(() => {
     const loadProperty = async () => {
@@ -49,6 +50,19 @@ export default function PropertyDetailPage({ params }: { params: Promise<{ id: s
         const res = await fetch(`/api/properties/${id}`)
         const data = await res.json()
         setProperty(data.property)
+
+        // Track as recently viewed
+        if (data.property) {
+          addToRecentlyViewed({
+            id: data.property._id || id,
+            slug: data.property.slug || id,
+            name: data.property.property_name || "Property",
+            thumbnail: data.property.main_thumbnail || "",
+            price: formatPriceToIndian(data.property.lowest_price) || "",
+            address: `${data.property.address || ""}, ${data.property.city || ""}`.replace(/^, |, $/g, ""),
+          })
+        }
+
         if (data.property?.developer_id) {
           const devRes = await fetch(`/api/admin/developers/${data.property.developer_id}`)
           if (devRes.ok) setDeveloper(await devRes.json())
@@ -60,49 +74,41 @@ export default function PropertyDetailPage({ params }: { params: Promise<{ id: s
       }
     }
     loadProperty()
-  }, [params])
+  }, [params, addToRecentlyViewed])
 
   if (loading) {
     return (
-      <>
-        <Header />
-        <div className="min-h-screen bg-background animate-pulse">
-          <div className="h-[50vh] bg-muted" />
-          <div className="max-w-6xl mx-auto px-3 py-4">
-            <div className="h-6 bg-muted rounded w-3/4 mb-3" />
-            <div className="h-4 bg-muted rounded w-1/2 mb-6" />
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-              <div className="lg:col-span-2 space-y-3">
-                <div className="h-40 bg-muted rounded-lg" />
-                <div className="h-40 bg-muted rounded-lg" />
-              </div>
-              <div className="h-72 bg-muted rounded-lg" />
+      <div className="min-h-screen bg-background animate-pulse">
+        <div className="h-[50vh] bg-muted" />
+        <div className="max-w-6xl mx-auto px-3 py-4">
+          <div className="h-6 bg-muted rounded w-3/4 mb-3" />
+          <div className="h-4 bg-muted rounded w-1/2 mb-6" />
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+            <div className="lg:col-span-2 space-y-3">
+              <div className="h-40 bg-muted rounded-lg" />
+              <div className="h-40 bg-muted rounded-lg" />
             </div>
+            <div className="h-72 bg-muted rounded-lg" />
           </div>
         </div>
-
-      </>
+      </div>
     )
   }
 
   if (!property) {
     return (
-      <>
-        <Header />
-        <div className="min-h-screen flex flex-col items-center justify-center bg-background gap-4">
-          <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center">
-            <Building2 className="h-8 w-8 text-muted-foreground/50" />
-          </div>
-          <div className="text-center">
-            <h1 className="text-xl font-bold text-foreground mb-1">Property Not Found</h1>
-            <p className="text-sm text-muted-foreground mb-4">The property you're looking for doesn't exist.</p>
-            <Button asChild size="sm">
-              <Link href="/properties"><ArrowLeft className="h-3 w-3 mr-1" />Browse Properties</Link>
-            </Button>
-          </div>
+      <div className="min-h-screen flex flex-col items-center justify-center bg-background gap-4">
+        <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center">
+          <Building2 className="h-8 w-8 text-muted-foreground/50" />
         </div>
-
-      </>
+        <div className="text-center">
+          <h1 className="text-xl font-bold text-foreground mb-1">Property Not Found</h1>
+          <p className="text-sm text-muted-foreground mb-4">{"The property you're looking for doesn't exist."}</p>
+          <Button asChild size="sm">
+            <Link href="/properties"><ArrowLeft className="h-3 w-3 mr-1" />Browse Properties</Link>
+          </Button>
+        </div>
+      </div>
     )
   }
 
@@ -177,9 +183,7 @@ export default function PropertyDetailPage({ params }: { params: Promise<{ id: s
   ].filter(spec => spec.value && (spec.show === undefined || spec.show))
 
   return (
-    <>
-      <Header />
-      <main className="min-h-screen bg-background">
+    <main className="min-h-screen bg-background">
         {schemaMarkup && (
           <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schemaMarkup) }} />
         )}
@@ -627,7 +631,6 @@ export default function PropertyDetailPage({ params }: { params: Promise<{ id: s
             <div className="absolute bottom-3 left-1/2 -translate-x-1/2 text-white text-xs">{activeImage + 1} / {images.length}</div>
           </div>
         )}
-      </main>
-    </>
+    </main>
   )
 }

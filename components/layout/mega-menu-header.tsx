@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { LocationMegaMenu, ProjectMegaMenu } from "./product-mega-menu-content"
 import { BUDGET_RANGES } from "@/lib/utils"
+import HeaderSearch from "./header-search"
 
 interface CurrentUser {
   id: string
@@ -199,6 +200,11 @@ export default function MegaMenuHeader() {
             </Link>
           </div>
 
+          {/* Desktop Search */}
+          <div className="hidden lg:block relative">
+            <HeaderSearch />
+          </div>
+
           {/* Desktop Auth */}
           <div className="hidden lg:flex items-center gap-2">
             {mounted ? (
@@ -266,6 +272,11 @@ export default function MegaMenuHeader() {
       {mobileMenuOpen && (
         <div className="lg:hidden border-t border-gray-200 bg-white fixed top-16 left-0 right-0 bottom-0 z-40 overflow-y-auto">
           <div className="flex flex-col gap-1 px-4 py-3">
+            {/* Mobile Search Bar */}
+            <div className="mb-3">
+              <HeaderSearch />
+            </div>
+
             <Link
               href="/"
               className="px-3 py-2 text-sm font-medium text-gray-700 hover:text-[#002366] hover:bg-gray-50 rounded transition-colors"

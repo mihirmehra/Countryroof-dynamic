@@ -11,6 +11,8 @@ export default function Footer() {
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({})
   const [formData, setFormData] = useState({ name: "", phone: "", message: "" })
   const [formSubmitted, setFormSubmitted] = useState(false)
+  const [formLoading, setFormLoading] = useState(false)
+  const [formError, setFormError] = useState("")
 
   const toggleSection = (section: string) => {
     setExpandedSections((prev) => ({
@@ -19,13 +21,35 @@ export default function Footer() {
     }))
   }
 
-  const handleFormSubmit = (e: React.FormEvent) => {
+  const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setFormSubmitted(true)
-    setTimeout(() => {
-      setFormData({ name: "", phone: "", message: "" })
-      setFormSubmitted(false)
-    }, 3000)
+    setFormLoading(true)
+    setFormError("")
+
+    try {
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: formData.name,
+          phone: formData.phone,
+          message: formData.message || "Callback request from footer form",
+          source: "footer_callback",
+        }),
+      })
+
+      if (!res.ok) throw new Error("Failed to submit")
+
+      setFormSubmitted(true)
+      setTimeout(() => {
+        setFormData({ name: "", phone: "", message: "" })
+        setFormSubmitted(false)
+      }, 3000)
+    } catch {
+      setFormError("Something went wrong. Please try again.")
+    } finally {
+      setFormLoading(false)
+    }
   }
 
   const quickLinks = [
@@ -181,11 +205,15 @@ export default function Footer() {
                 </div>
                 <button
                   type="submit"
-                  className="w-full bg-red-500 hover:bg-red-600 text-white font-semibold py-3 rounded-lg transition-all duration-300 transform hover:scale-105 flex items-center justify-center gap-2"
+                  disabled={formLoading}
+                  className="w-full bg-red-500 hover:bg-red-600 disabled:opacity-70 disabled:cursor-not-allowed text-white font-semibold py-3 rounded-lg transition-all duration-300 transform hover:scale-105 disabled:hover:scale-100 flex items-center justify-center gap-2"
                 >
-                  <span>Get Callback</span>
-                  <Send size={16} />
+                  <span>{formLoading ? "Submitting..." : "Get Callback"}</span>
+                  {!formLoading && <Send size={16} />}
                 </button>
+                {formError && (
+                  <p className="text-xs text-red-300 text-center">{formError}</p>
+                )}
                 <p className="text-xs text-blue-100 text-center">Get expert advice on your property investment.</p>
               </form>
             )}

@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation"
 import MegaMenuHeader from "./mega-menu-header"
 import Footer from "./footer"
 import BottomNav from "./bottom-nav"
+import WhatsAppButton from "@/components/ui/whatsapp-button"
 
 export default function FrontendLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
@@ -27,6 +28,7 @@ export default function FrontendLayout({ children }: { children: React.ReactNode
       {children}
       <Footer />
       <BottomNav />
+      <WhatsAppButton />
     </>
   )
 }

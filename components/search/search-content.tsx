@@ -2,8 +2,6 @@
 
 import { useState, useEffect } from "react"
 import { useSearchParams } from "next/navigation"
-import Header from "@/components/layout/header"
-import Footer from "@/components/layout/footer"
 import Link from "next/link"
 import { MapPin, Bed, Bath, Maximize2, Heart } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -69,9 +67,7 @@ export default function SearchContent() {
   }
 
   return (
-    <>
-      <Header />
-      <main className="min-h-screen px-4 py-12">
+    <main className="min-h-screen px-4 py-12">
         <div className="max-w-6xl mx-auto space-y-8">
           <div className="space-y-2">
             <h1>Search Results</h1>
@@ -246,8 +242,6 @@ export default function SearchContent() {
             </>
           )}
         </div>
-      </main>
-      <Footer />
-    </>
+    </main>
   )
 }

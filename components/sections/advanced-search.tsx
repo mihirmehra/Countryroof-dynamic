@@ -1,11 +1,12 @@
 "use client"
 
 import { useState, useEffect, useRef } from "react"
-import { Search, Building2, Home, MapPin, Sparkles, ArrowRight } from "lucide-react"
+import { Search, Building2, Home, MapPin, Sparkles, ArrowRight, Mic, MicOff } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { cn, BUDGET_RANGES } from "@/lib/utils"
+import { useVoiceSearch } from "@/hooks/use-voice-search"
 
 const PLACEHOLDER_SUGGESTIONS = [
   "3 BHK in Gurgaon",
@@ -68,6 +69,14 @@ export default function AdvancedSearch() {
   const searchRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
   const router = useRouter()
+
+  const { isListening, isSupported: voiceSupported, startListening, stopListening, error: voiceError } = useVoiceSearch({
+    lang: "en-US",
+    onResult: (text) => {
+      setSearchTerm(text)
+      setShowSuggestions(true)
+    },
+  })
 
   // Typewriter effect for placeholder
   useEffect(() => {
@@ -160,7 +169,7 @@ export default function AdvancedSearch() {
   }
 
   return (
-    <div className="relative -mt-20 z-10 max-w-5xl mx-auto px-4">
+    <div className="relative -mt-10 z-10 max-w-5xl mx-auto px-4">
       <div 
         className="bg-white rounded-2xl shadow-2xl overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-700" 
         ref={searchRef}
@@ -197,7 +206,7 @@ export default function AdvancedSearch() {
                   }
                 }}
                 className={cn(
-                  "w-full h-14 pl-12 pr-4 text-base rounded-xl",
+                  "w-full h-14 pl-12 pr-12 text-base rounded-xl",
                   "border-2 border-border bg-muted/30",
                   "focus:outline-none focus:border-primary focus:bg-background",
                   "transition-all duration-300",
@@ -205,6 +214,29 @@ export default function AdvancedSearch() {
                 )}
               />
               
+              {/* Voice Search Button */}
+              {voiceSupported && (
+                <button
+                  type="button"
+                  onClick={isListening ? stopListening : startListening}
+                  className={cn(
+                    "absolute right-3 top-1/2 -translate-y-1/2 p-2 rounded-lg transition-all duration-300",
+                    isListening
+                      ? "bg-destructive/10 text-destructive voice-pulse"
+                      : "text-muted-foreground hover:text-primary hover:bg-primary/10"
+                  )}
+                  aria-label={isListening ? "Stop voice search" : "Start voice search"}
+                  title={isListening ? "Listening... Click to stop" : "Search by voice"}
+                >
+                  {isListening ? <MicOff className="h-5 w-5" /> : <Mic className="h-5 w-5" />}
+                </button>
+              )}
+
+              {/* Voice Error Message */}
+              {voiceError && (
+                <p className="absolute -bottom-6 left-0 text-xs text-destructive">{voiceError}</p>
+              )}
+
               {/* Suggestions Dropdown */}
               {showSuggestions && suggestions.length > 0 && (
                 <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-border rounded-xl shadow-xl max-h-72 overflow-y-auto z-50 animate-in fade-in slide-in-from-top-2 duration-200">

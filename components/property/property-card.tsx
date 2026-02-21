@@ -2,6 +2,7 @@ import Link from "next/link"
 import { MapPin, Bed, Bath, Maximize2 } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { formatPriceRange } from "@/lib/utils"
+import { PropertyWhatsAppLink } from "@/components/ui/whatsapp-button"
 
 interface PropertyCardProps {
   property: {
@@ -31,7 +32,7 @@ export default function PropertyCard({ property }: PropertyCardProps) {
   
   return (
     <Link href={`/properties/${property.slug || property._id}`}>
-      <div className="bento-card hover:shadow-lg cursor-pointer">
+      <div className="bento-card hover:shadow-lg cursor-pointer group">
         {/* Image with badges */}
         <div className="relative mb-2.5 overflow-hidden rounded bg-muted h-40 hover:shadow-md transition-shadow">
           <img
@@ -50,6 +51,9 @@ export default function PropertyCard({ property }: PropertyCardProps) {
                 Hot
               </Badge>
             )}
+          </div>
+          <div className="absolute bottom-2 right-2 transition-opacity duration-200">
+            <PropertyWhatsAppLink propertyName={property.property_name} />
           </div>
         </div>
 

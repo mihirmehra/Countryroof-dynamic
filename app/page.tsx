@@ -8,12 +8,14 @@ import DynamicSections from "@/components/sections/dynamic-sections"
 import WhyChooseUs from "@/components/sections/why-choose-us"
 import TrendingLocations from "@/components/sections/trending-locations"
 import FeaturedDevelopers from "@/components/sections/featured-developers"
+import RecentlyViewed from "@/components/sections/recently-viewed"
 
 export default function Home() {
   return (
     <Suspense fallback={null}>
       <BannerSlider />
       <AdvancedSearch />
+      <RecentlyViewed />
       <FeaturedVideoProperties />
       <TrendingLocations />
       <DynamicSections />
